@@ -164,7 +164,10 @@ function update(dt) {
       }
     } else if (distance(bullet, player) < bullet.r + player.r) { bullet.dead = true; hitPlayer(); }
   }
-  for (const enemy of enemies) if (enemy.hp > 0 && distance(enemy, player) < enemy.r + player.r) { enemy.hp = 0; destroyEnemy(enemy); hitPlayer(); }
+  for (const enemy of enemies) if (enemy.hp > 0 && distance(enemy, player) < enemy.r + player.r) {
+    if (enemy.type === "boss") hitPlayer();
+    else { enemy.hp = 0; destroyEnemy(enemy); hitPlayer(); }
+  }
   for (const pickup of pickups) if (distance(pickup, player) < pickup.r + player.r) { pickup.dead = true; player.power = Math.min(4, player.power + 1); score += 250; burst(pickup.x, pickup.y, "#ffe85f", 18, 150); updateUI(); }
 
   bullets = bullets.filter((b) => !b.dead && b.y > -30 && b.y < height + 30 && b.x > -30 && b.x < width + 30);
