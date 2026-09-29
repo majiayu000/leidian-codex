@@ -62,9 +62,16 @@ function updateUI() {
   if (boss) ui.bossHealth.style.width = `${Math.max(0, boss.hp / boss.maxHp) * 100}%`;
 }
 
+const POWER_SPREAD = {
+  1: [0],
+  2: [-.09, .09],
+  3: [-.09, 0, .09],
+  4: [-.18, -.09, 0, .09, .18],
+};
+
 function shoot() {
   if (player.cooldown > 0) return;
-  const spread = [-.18, -.09, 0, .09, .18].slice(2 - Math.floor(player.power / 2), 3 + Math.floor((player.power - 1) / 2));
+  const spread = POWER_SPREAD[player.power] || POWER_SPREAD[1];
   spread.forEach((angle) => bullets.push({ x: player.x, y: player.y - 22, vx: Math.sin(angle) * 230, vy: -560, r: 3, friendly: true, damage: 1 }));
   player.cooldown = Math.max(.085, .18 - player.power * .018);
   burst(player.x, player.y - 22, "#8ff8ff", 3, 70);
