@@ -14,7 +14,7 @@ const ui = {
 const TAU = Math.PI * 2;
 const keys = new Set();
 let width = 0, height = 0, dpr = 1, lastTime = 0, state = "menu";
-let score = 0, highScore = Number(localStorage.getItem("thunder-high-score") || 0);
+let score = 0, highScore = loadHighScore();
 let wave = 1, waveTimer = 0, spawnTimer = 0, shake = 0, flash = 0, touchActive = false;
 let player = null;
 let bullets = [];
@@ -23,6 +23,15 @@ let particles = [];
 let pickups = [];
 let stars = [];
 let boss = null;
+
+function loadHighScore() {
+  try {
+    const saved = Number(localStorage.getItem("thunder-high-score"));
+    return Number.isSafeInteger(saved) && saved >= 0 ? saved : 0;
+  } catch {
+    return 0;
+  }
+}
 
 function resize() {
   const rect = canvas.getBoundingClientRect();
@@ -124,7 +133,14 @@ function destroyEnemy(enemy) {
 function endGame() {
   state = "gameover";
   const isRecord = score > highScore;
-  if (isRecord) { highScore = score; localStorage.setItem("thunder-high-score", String(score)); }
+  if (isRecord) {
+    highScore = score;
+    try {
+      localStorage.setItem("thunder-high-score", String(highScore));
+    } catch {
+      // Keep the record for this page session when browser storage is unavailable.
+    }
+  }
   ui.finalScore.textContent = String(score).padStart(6, "0"); ui.newRecord.hidden = !isRecord;
   ui.gameOver.classList.add("active"); updateUI();
 }
